@@ -2,6 +2,7 @@ import os
 import io
 import base64
 import torch
+import traceback
 import torch.nn as nn
 from torchvision import models, transforms
 import cv2
@@ -120,7 +121,7 @@ async def predict_disease(file: UploadFile = File(...)):
                 results.append({
                     "disease": class_name,
                     "confidence": float(prob),
-                    "detected": prob > 0.5,
+                    "detected": bool(prob > 0.5),
                     "color": f"rgb({CLASS_COLORS[class_name][0]}, {CLASS_COLORS[class_name][1]}, {CLASS_COLORS[class_name][2]})"
                 })
                 
