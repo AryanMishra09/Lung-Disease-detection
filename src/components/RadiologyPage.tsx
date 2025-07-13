@@ -40,7 +40,7 @@ const RadiologyPage: React.FC = () => {
       formData.append("file", file);
 
       const response = await fetch(
-        "https://lung-disease-detection-wvi9.onrender.com/",
+        "https://lung-disease-detection-wvi9.onrender.com/predict",
         {
           method: "POST",
           body: formData,
