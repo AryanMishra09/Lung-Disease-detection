@@ -28,3 +28,5 @@ EXPOSE 8000
 
 # Command to run the FastAPI app with Uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# command to run docker locally: docker run -d -p 8000:8000 --name lung-api-container backend-lung-detection

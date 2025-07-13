@@ -11,7 +11,7 @@ function App() {
   useEffect(() => {
     const BACKEND_URL = "https://lung-disease-detection-wvi9.onrender.com/";
     const MAX_ATTEMPTS = 4;
-    const TIMEOUT = 10000; // 10 seconds
+    const TIMEOUT = 20000; // 20 seconds
 
     const fetchWithTimeout = (url: string, timeout: number) => {
       return new Promise<Response>((resolve, reject) => {
