@@ -27,12 +27,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-CLASSES = ["Normal", "COVID", "TB", "Pneumonia", "Lung_Opacity"]
+CLASSES = ["NORMAL", "COVID", "TURBERCULOSIS", "PNEUMONIA", "Lung_Opacity"]
 CLASS_COLORS = {
-    "Normal":        (0, 200, 83),
+    "NORMAL":        (0, 200, 83),
     "COVID":         (255, 69, 96),
-    "TB":            (72, 133, 237),
-    "Pneumonia":     (255, 193, 7),
+    "TURBERCULOSIS": (72, 133, 237),
+    "PNEUMONIA":     (255, 193, 7),
     "Lung_Opacity":  (142, 36, 170)
 }
 
@@ -156,6 +156,7 @@ async def predict_disease(file: UploadFile = File(...)):
             os.unlink(temp_path)
             
     except Exception as e:
+        traceback.print_exc()  #Logs full stack trace to console
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 if __name__ == "__main__":
