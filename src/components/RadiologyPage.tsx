@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import ImageUpload from './ImageUpload';
-import ResultsDisplay from './ResultsDisplay';
-import { AlertCircle } from 'lucide-react';
+import React, { useState, useCallback } from "react";
+import ImageUpload from "./ImageUpload";
+import ResultsDisplay from "./ResultsDisplay";
+import { AlertCircle } from "lucide-react";
 
 export interface PredictionResult {
   disease: string;
@@ -37,22 +37,27 @@ const RadiologyPage: React.FC = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const response = await fetch('http://localhost:8000/predict', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(
+        "https://lung-disease-detection-wvi9.onrender.com/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Analysis failed');
+        throw new Error(errorData.detail || "Analysis failed");
       }
 
       const data: AnalysisResults = await response.json();
       setResults(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
     } finally {
       setLoading(false);
     }
@@ -72,7 +77,8 @@ const RadiologyPage: React.FC = () => {
             AI Chest X-Ray Analysis
           </h1>
           <p className="text-xl text-blue-200 max-w-3xl mx-auto leading-relaxed">
-            Upload a chest X-ray image for automated lung disease detection with AI-powered visual analysis
+            Upload a chest X-ray image for automated lung disease detection with
+            AI-powered visual analysis
           </p>
         </div>
 
@@ -82,13 +88,19 @@ const RadiologyPage: React.FC = () => {
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-6 h-6 text-red-400 mt-0.5" />
               <div>
-                <h3 className="text-lg font-semibold text-red-300 mb-2">Analysis Error</h3>
+                <h3 className="text-lg font-semibold text-red-300 mb-2">
+                  Analysis Error
+                </h3>
                 <p className="text-red-200">{error}</p>
-                {error.includes('Model file not found') && (
+                {error.includes("Model file not found") && (
                   <div className="mt-4 p-4 bg-red-500/20 rounded-lg">
                     <p className="text-red-200 text-sm">
-                      <strong>Setup Required:</strong> Please download the model file from the provided Google Drive link 
-                      and place it as <code className="bg-black/30 px-2 py-1 rounded">model.pth</code> in the backend directory.
+                      <strong>Setup Required:</strong> Please download the model
+                      file from the provided Google Drive link and place it as{" "}
+                      <code className="bg-black/30 px-2 py-1 rounded">
+                        model.pth
+                      </code>{" "}
+                      in the backend directory.
                     </p>
                   </div>
                 )}

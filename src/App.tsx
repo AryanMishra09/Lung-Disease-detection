@@ -1,11 +1,54 @@
-import React, { useState } from 'react';
-import LandingPage from './components/LandingPage';
-import RadiologyPage from './components/RadiologyPage';
-import { Brain, Stethoscope } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import LandingPage from "./components/LandingPage";
+import RadiologyPage from "./components/RadiologyPage";
+import { Brain, Stethoscope } from "lucide-react";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'landing' | 'radiology'>('landing');
+  const [currentPage, setCurrentPage] = useState<"landing" | "radiology">(
+    "landing"
+  );
+  // Backend wake-up logic
+  useEffect(() => {
+    const BACKEND_URL = "https://lung-disease-detection-wvi9.onrender.com/";
+    const MAX_ATTEMPTS = 4;
+    const TIMEOUT = 10000; // 10 seconds
 
+    const fetchWithTimeout = (url: string, timeout: number) => {
+      return new Promise<Response>((resolve, reject) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => {
+          controller.abort();
+        }, timeout);
+
+        fetch(url, { signal: controller.signal })
+          .then((response) => {
+            clearTimeout(timer);
+            resolve(response);
+          })
+          .catch((err) => {
+            clearTimeout(timer);
+            reject(err);
+          });
+      });
+    };
+
+    const pingBackend = async () => {
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+          const res = await fetchWithTimeout(BACKEND_URL, TIMEOUT);
+          const data = await res.json();
+          if (data?.message === "Lung Disease Detection API is running") {
+            console.log(`✅ Backend awake on attempt ${attempt}`);
+            break;
+          }
+        } catch (error: unknown) {
+          console.warn(`⚠️ Attempt ${attempt} failed to wake backend.`, error);
+        }
+      }
+    };
+
+    pingBackend();
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       {/* Navigation */}
@@ -21,24 +64,24 @@ function App() {
                 <p className="text-sm text-blue-200">Diagnostic Support</p>
               </div>
             </div>
-            
+
             <div className="flex space-x-1 bg-white/10 rounded-lg p-1">
               <button
-                onClick={() => setCurrentPage('landing')}
+                onClick={() => setCurrentPage("landing")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  currentPage === 'landing'
-                    ? 'bg-white/20 text-white shadow-lg'
-                    : 'text-blue-200 hover:text-white hover:bg-white/10'
+                  currentPage === "landing"
+                    ? "bg-white/20 text-white shadow-lg"
+                    : "text-blue-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 Overview
               </button>
               <button
-                onClick={() => setCurrentPage('radiology')}
+                onClick={() => setCurrentPage("radiology")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                  currentPage === 'radiology'
-                    ? 'bg-white/20 text-white shadow-lg'
-                    : 'text-blue-200 hover:text-white hover:bg-white/10'
+                  currentPage === "radiology"
+                    ? "bg-white/20 text-white shadow-lg"
+                    : "text-blue-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 <Stethoscope className="w-4 h-4" />
@@ -51,7 +94,7 @@ function App() {
 
       {/* Page Content */}
       <div className="pt-20">
-        {currentPage === 'landing' ? <LandingPage /> : <RadiologyPage />}
+        {currentPage === "landing" ? <LandingPage /> : <RadiologyPage />}
       </div>
     </div>
   );
