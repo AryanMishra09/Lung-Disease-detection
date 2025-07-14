@@ -214,7 +214,7 @@ const LandingPage: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-2">
-                        ResNet18 Backbone
+                        DenseNet121 Backbone
                       </h3>
                       <p className="text-blue-200">
                         Deep residual neural network optimized for medical image
@@ -262,7 +262,7 @@ const LandingPage: React.FC = () => {
                 <div className="space-y-4">
                   {[
                     "Image Upload & Preprocessing",
-                    "ResNet18 Feature Extraction",
+                    "DenseNet121 Feature Extraction",
                     "Multi-Label Classification",
                     "Grad-CAM Generation",
                     "Result Visualization",
