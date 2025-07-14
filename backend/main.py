@@ -40,8 +40,8 @@ CLASS_COLORS = {
 MODEL_PATH = "model.pth"
 
 def get_model():
-    model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-    model.fc = nn.Linear(512, len(CLASSES))
+    model = models.densenet121(weights=models.DenseNet121_Weights.IMAGENET1K_V1)
+    model.classifier = nn.Linear(model.classifier.in_features, len(CLASSES))
     return model
 
 def run_grad_cam_on_image(img_path, model_path, cam_threshold=0.6):
@@ -60,7 +60,7 @@ def run_grad_cam_on_image(img_path, model_path, cam_threshold=0.6):
     probs = torch.sigmoid(output).detach().numpy()[0]
     predicted = (probs > 0.5).astype(int)
 
-    cam = GradCAM(model=model, target_layers=[model.layer4[-1]])
+    cam = GradCAM(model=model, target_layers=[model.features[-2]])
     overlays = []
     
     for i, present in enumerate(predicted):
