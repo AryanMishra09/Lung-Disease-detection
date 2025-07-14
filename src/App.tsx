@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import LandingPage from "./components/LandingPage";
 import RadiologyPage from "./components/RadiologyPage";
 import { Brain, Stethoscope } from "lucide-react";
+import NProgress from "nprogress";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<"landing" | "radiology">(
@@ -11,14 +12,12 @@ function App() {
   useEffect(() => {
     const BACKEND_URL = "https://lung-disease-detection-wvi9.onrender.com/";
     const MAX_ATTEMPTS = 4;
-    const TIMEOUT = 20000; // 20 seconds
+    const TIMEOUT = 20000;
 
     const fetchWithTimeout = (url: string, timeout: number) => {
       return new Promise<Response>((resolve, reject) => {
         const controller = new AbortController();
-        const timer = setTimeout(() => {
-          controller.abort();
-        }, timeout);
+        const timer = setTimeout(() => controller.abort(), timeout);
 
         fetch(url, { signal: controller.signal })
           .then((response) => {
@@ -33,6 +32,7 @@ function App() {
     };
 
     const pingBackend = async () => {
+      NProgress.start(); // Start the loading bar
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         try {
           const res = await fetchWithTimeout(BACKEND_URL, TIMEOUT);
@@ -41,10 +41,11 @@ function App() {
             console.log(`✅ Backend awake on attempt ${attempt}`);
             break;
           }
-        } catch (error: unknown) {
+        } catch (error) {
           console.warn(`⚠️ Attempt ${attempt} failed to wake backend.`, error);
         }
       }
+      NProgress.done(); // Stop the loading bar
     };
 
     pingBackend();
