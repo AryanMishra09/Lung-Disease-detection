@@ -44,10 +44,13 @@ def get_model():
     model.classifier = nn.Linear(model.classifier.in_features, len(CLASSES))
     return model
 
+# ✅ Global model (loaded once)
+MODEL = get_model()
+MODEL.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
+MODEL.eval()
+
 def run_grad_cam_on_image(img_path, model_path, cam_threshold=0.6):
-    model = get_model()
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
-    model.eval()
+    model = MODEL
 
     raw = cv2.imread(img_path)
     rgb = cv2.cvtColor(raw, cv2.COLOR_BGR2RGB)
@@ -70,6 +73,14 @@ def run_grad_cam_on_image(img_path, model_path, cam_threshold=0.6):
             grayscale_cam = cv2.resize(grayscale_cam, (gray.shape[1], gray.shape[0]))
             mask = np.uint8(grayscale_cam > cam_threshold) * 255
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # ➕ New heuristic: skip overlay if activation area too small
+            activation_area = np.count_nonzero(mask)
+            total_area = mask.shape[0] * mask.shape[1]
+            cam_ratio = activation_area / total_area
+
+            if cam_ratio < 0.01:
+                print(f"⚠️ Skipping {class_name}: low activation area ({cam_ratio:.4f})")
+                continue  # Skip adding this class
             fill_color = CLASS_COLORS[class_name]
             mask_rgb = np.zeros_like(gray_3ch)
             cv2.drawContours(mask_rgb, contours, -1, fill_color, thickness=cv2.FILLED)
